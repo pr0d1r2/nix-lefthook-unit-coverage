@@ -1,0 +1,4 @@
+pre-push:
+  commands:
+    unit-coverage:
+      run: timeout ${LEFTHOOK_UNIT_COVERAGE_TIMEOUT:-30} lefthook-unit-coverage
