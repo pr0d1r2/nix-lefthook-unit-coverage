@@ -1,0 +1,7 @@
+default: 4096
+extensions:
+  lock: 65536
+  sh: 8192
+  nix: 4096
+  bats: 16384
+  yml: 4096
