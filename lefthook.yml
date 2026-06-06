@@ -1,4 +1,7 @@
 ---
+output:
+  - failure
+
 remotes:
   - git_url: https://github.com/pr0d1r2/nix-lefthook-nixfmt
     ref: main
@@ -53,6 +56,10 @@ remotes:
     configs:
       - lefthook-remote.yml
   - git_url: https://github.com/pr0d1r2/nix-lefthook-nix-no-embedded-shell
+    ref: main
+    configs:
+      - lefthook-remote.yml
+  - git_url: https://github.com/pr0d1r2/nix-lefthook-file-size-check
     ref: main
     configs:
       - lefthook-remote.yml
