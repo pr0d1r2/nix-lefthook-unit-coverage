@@ -31,14 +31,6 @@ if [ -f "$ALLOWLIST_FILE" ]; then
   done <"$ALLOWLIST_FILE"
 fi
 
-list_files() {
-  if [ -n "${LEFTHOOK_UNIT_COVERAGE_ROOT:-}" ]; then
-    find . -type f ! -path './.git/*' | sed 's|^\./||'
-  else
-    git ls-files
-  fi
-}
-
 total_missing=0
 idx=0
 while taplo get -f "$CONFIG" -o value "rules[$idx].glob" >/dev/null 2>&1; do
@@ -56,7 +48,11 @@ while taplo get -f "$CONFIG" -o value "rules[$idx].glob" >/dev/null 2>&1; do
   ext="${rule_glob#\*.}"
 
   mapfile -t impls < <(
-    list_files | while IFS= read -r f; do
+    if [ -n "${LEFTHOOK_UNIT_COVERAGE_ROOT:-}" ]; then
+      find . -type f ! -path './.git/*' | sed 's|^\./||'
+    else
+      git ls-files
+    fi | while IFS= read -r f; do
       case "$f" in
         *."$ext") ;;
         *) continue ;;
