@@ -1,16 +1,28 @@
 #!/usr/bin/env bats
 
 setup() {
-    # BATS_LIB_PATH is normally exported by dev.sh. CI may provide the
-    # bats-with-libraries wrapper without exporting that variable, so derive
-    # the bundled library location from bats when the search path is absent.
-    bats_lib_root="${BATS_LIB_PATH%%:*}"
-    if [ -z "$bats_lib_root" ]; then
+    # BATS_LIB_PATH may contain one share/bats directory per library.  Do not
+    # assume both libraries live below the first entry (as in the CI wrapper).
+    load_bats_lib() {
+        local library="$1" root
+        IFS=: read -ra bats_lib_roots <<< "${BATS_LIB_PATH:-}"
+        for root in "${bats_lib_roots[@]}"; do
+            if [ -f "$root/$library/load.bash" ]; then
+                load "$root/$library/load.bash"
+                return 0
+            fi
+        done
+
         bats_bin="$(command -v bats)"
-        bats_lib_root="$(dirname "$bats_bin")/../share/bats"
-    fi
-    load "$bats_lib_root/bats-support/load.bash"
-    load "$bats_lib_root/bats-assert/load.bash"
+        root="$(dirname "$bats_bin")/../share/bats"
+        if [ -f "$root/$library/load.bash" ]; then
+            load "$root/$library/load.bash"
+            return 0
+        fi
+        return 1
+    }
+    load_bats_lib bats-support
+    load_bats_lib bats-assert
 
     TMP="$BATS_TEST_TMPDIR/repo"
     mkdir -p "$TMP"
