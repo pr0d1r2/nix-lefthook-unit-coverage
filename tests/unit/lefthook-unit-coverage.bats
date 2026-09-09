@@ -16,7 +16,12 @@ setup() {
                 "$root/share/$library/load.bash" \
                 "$root/load.bash"; do
                 if [ -f "$candidate" ]; then
-                    load "$candidate"
+                    # Source the resolved file directly.  The shared CI
+                    # wrapper may set BATS_LIB_PATH to a package root rather
+                    # than a Bats library search path; using `load` here
+                    # re-interprets that path and can fail even after the
+                    # library was resolved successfully.
+                    source "$candidate"
                     return 0
                 fi
             done
@@ -29,7 +34,7 @@ setup() {
             [ -d "$root" ] || continue
             candidate="$(find "$root" -type f -path "*/$library/load.bash" -print -quit 2>/dev/null)"
             if [ -n "$candidate" ]; then
-                load "$candidate"
+                source "$candidate"
                 return 0
             fi
         done
@@ -38,7 +43,7 @@ setup() {
         if [ -n "$bats_bin" ]; then
             root="$(dirname "$bats_bin")/../share/bats"
             if [ -f "$root/$library/load.bash" ]; then
-                load "$root/$library/load.bash"
+                source "$root/$library/load.bash"
                 return 0
             fi
         fi
