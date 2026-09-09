@@ -22,6 +22,18 @@ setup() {
             done
         done
 
+        # Some Nix compositions expose a package root rather than the
+        # conventional share/bats root.  Search that root as a last resort;
+        # BATS_LIB_PATH is intentionally allowed to contain either form.
+        for root in "${bats_lib_roots[@]}"; do
+            [ -d "$root" ] || continue
+            candidate="$(find "$root" -type f -path "*/$library/load.bash" -print -quit 2>/dev/null)"
+            if [ -n "$candidate" ]; then
+                load "$candidate"
+                return 0
+            fi
+        done
+
         bats_bin="$(command -v bats 2>/dev/null || true)"
         if [ -n "$bats_bin" ]; then
             root="$(dirname "$bats_bin")/../share/bats"
