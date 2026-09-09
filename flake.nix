@@ -62,7 +62,7 @@
         in
         set-and-setting.lib.mkDevShells {
           inherit pkgs;
-          basePackages = mat.packages;
+          basePackages = mat.packages ++ [ self.packages.${sys}.default ];
           settingHook = ''
             ${self.packages.${sys}.setting}/bin/sync-setting .
             _assemble_out="$(mktemp -d)"
