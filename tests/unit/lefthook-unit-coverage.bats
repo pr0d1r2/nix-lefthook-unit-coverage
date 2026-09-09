@@ -1,9 +1,14 @@
 #!/usr/bin/env bats
 
 setup() {
-    # BATS_LIB_PATH is a colon-separated search path; use its first entry
-    # when constructing the explicit paths expected by these libraries.
+    # BATS_LIB_PATH is normally exported by dev.sh. CI may provide the
+    # bats-with-libraries wrapper without exporting that variable, so derive
+    # the bundled library location from bats when the search path is absent.
     bats_lib_root="${BATS_LIB_PATH%%:*}"
+    if [ -z "$bats_lib_root" ]; then
+        bats_bin="$(command -v bats)"
+        bats_lib_root="$(dirname "$bats_bin")/../share/bats"
+    fi
     load "$bats_lib_root/bats-support/load.bash"
     load "$bats_lib_root/bats-assert/load.bash"
 
