@@ -1,8 +1,11 @@
 #!/usr/bin/env bats
 
 setup() {
-    load "${BATS_LIB_PATH}/bats-support/load.bash"
-    load "${BATS_LIB_PATH}/bats-assert/load.bash"
+    # BATS_LIB_PATH is a colon-separated search path; use its first entry
+    # when constructing the explicit paths expected by these libraries.
+    bats_lib_root="${BATS_LIB_PATH%%:*}"
+    load "$bats_lib_root/bats-support/load.bash"
+    load "$bats_lib_root/bats-assert/load.bash"
 
     TMP="$BATS_TEST_TMPDIR/repo"
     mkdir -p "$TMP"
