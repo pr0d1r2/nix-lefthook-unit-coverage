@@ -58,11 +58,18 @@
         pkgs:
         let
           mat = set-and-setting.lib.materializationFor { inherit pkgs fragments; };
+          bats = pkgs.bats.withLibraries (libraries: [
+            libraries.bats-assert
+            libraries.bats-support
+          ]);
           sys = pkgs.stdenv.hostPlatform.system;
         in
         set-and-setting.lib.mkDevShells {
           inherit pkgs;
-          basePackages = mat.packages ++ [ self.packages.${sys}.default ];
+          basePackages = mat.packages ++ [
+            bats
+            self.packages.${sys}.default
+          ];
           settingHook = ''
             ${self.packages.${sys}.setting}/bin/sync-setting .
             _assemble_out="$(mktemp -d)"
