@@ -35,6 +35,7 @@
         "nix"
         "shell"
         "ascii"
+        "set"
         "markdown"
         "yaml"
       ];
@@ -58,12 +59,20 @@
         pkgs:
         let
           mat = set-and-setting.lib.materializationFor { inherit pkgs fragments; };
+          bats = pkgs.bats.withLibraries (libraries: [
+            libraries.bats-assert
+            libraries.bats-support
+          ]);
           sys = pkgs.stdenv.hostPlatform.system;
         in
         set-and-setting.lib.mkDevShells {
           inherit pkgs;
-          basePackages = mat.packages;
+          basePackages = mat.packages ++ [
+            bats
+            self.packages.${sys}.default
+          ];
           settingHook = ''
+            export BATS_LIB_PATH="${bats}/share/bats"
             ${self.packages.${sys}.setting}/bin/sync-setting .
             _assemble_out="$(mktemp -d)"
             FRAGMENTS="${builtins.concatStringsSep " " fragments}" \
