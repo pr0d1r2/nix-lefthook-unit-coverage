@@ -35,7 +35,6 @@
         "nix"
         "shell"
         "ascii"
-        "set"
         "markdown"
         "yaml"
       ];
