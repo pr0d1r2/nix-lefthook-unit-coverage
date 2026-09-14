@@ -63,25 +63,26 @@
             libraries.bats-support
           ]);
           sys = pkgs.stdenv.hostPlatform.system;
+          shells = set-and-setting.lib.mkDevShells {
+            inherit pkgs;
+            basePackages = mat.packages ++ [
+              bats
+              self.packages.${sys}.default
+            ];
+            settingHook = ''
+              export BATS_LIB_PATH="${bats}/share/bats"
+              ${self.packages.${sys}.setting}/bin/sync-setting .
+              _assemble_out="$(mktemp -d)"
+              FRAGMENTS="${builtins.concatStringsSep " " fragments}" \
+                out="$_assemble_out" \
+                FRAGMENTS_DIR="${set-and-setting}/setting/integrations/lefthook" \
+                bash "${set-and-setting}/setting/lib/assemble-lefthook.sh"
+              cp -f "$_assemble_out/lefthook.yml" lefthook.yml
+              rm -rf "$_assemble_out"
+            '';
+          };
         in
-        set-and-setting.lib.mkDevShells {
-          inherit pkgs;
-          basePackages = mat.packages ++ [
-            bats
-            self.packages.${sys}.default
-          ];
-          settingHook = ''
-            export BATS_LIB_PATH="${bats}/share/bats"
-            ${self.packages.${sys}.setting}/bin/sync-setting .
-            _assemble_out="$(mktemp -d)"
-            FRAGMENTS="${builtins.concatStringsSep " " fragments}" \
-              out="$_assemble_out" \
-              FRAGMENTS_DIR="${set-and-setting}/setting/integrations/lefthook" \
-              bash "${set-and-setting}/setting/lib/assemble-lefthook.sh"
-            cp -f "$_assemble_out/lefthook.yml" lefthook.yml
-            rm -rf "$_assemble_out"
-          '';
-        }
+        shells // { ci = shells.default; }
       );
 
       checks = forAllSystems (
