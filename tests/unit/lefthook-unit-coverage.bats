@@ -1,8 +1,56 @@
 #!/usr/bin/env bats
 
 setup() {
-    load "${BATS_LIB_PATH}/bats-support/load.bash"
-    load "${BATS_LIB_PATH}/bats-assert/load.bash"
+    # BATS_LIB_PATH may contain one share/bats directory per library.  Do not
+    # assume both libraries live below the first entry (as in the CI wrapper).
+    load_bats_lib() {
+        local library="$1" root candidate
+        IFS=: read -ra bats_lib_roots <<< "${BATS_LIB_PATH:-}"
+        for root in "${bats_lib_roots[@]}"; do
+            # Depending on how the Nix package is assembled, BATS_LIB_PATH
+            # may point at share/bats, share, or the library package itself.
+            for candidate in \
+                "$root/$library/load.bash" \
+                "$root/bats/$library/load.bash" \
+                "$root/share/bats/$library/load.bash" \
+                "$root/share/$library/load.bash" \
+                "$root/load.bash"; do
+                if [ -f "$candidate" ]; then
+                    # Source the resolved file directly.  The shared CI
+                    # wrapper may set BATS_LIB_PATH to a package root rather
+                    # than a Bats library search path; using `load` here
+                    # re-interprets that path and can fail even after the
+                    # library was resolved successfully.
+                    source "$candidate"
+                    return 0
+                fi
+            done
+        done
+
+        # Some Nix compositions expose a package root rather than the
+        # conventional share/bats root.  Search that root as a last resort;
+        # BATS_LIB_PATH is intentionally allowed to contain either form.
+        for root in "${bats_lib_roots[@]}"; do
+            [ -d "$root" ] || continue
+            candidate="$(find "$root" -type f -path "*/$library/load.bash" -print -quit 2>/dev/null)"
+            if [ -n "$candidate" ]; then
+                source "$candidate"
+                return 0
+            fi
+        done
+
+        bats_bin="$(command -v bats 2>/dev/null || true)"
+        if [ -n "$bats_bin" ]; then
+            root="$(dirname "$bats_bin")/../share/bats"
+            if [ -f "$root/$library/load.bash" ]; then
+                source "$root/$library/load.bash"
+                return 0
+            fi
+        fi
+        return 1
+    }
+    load_bats_lib bats-support
+    load_bats_lib bats-assert
 
     TMP="$BATS_TEST_TMPDIR/repo"
     mkdir -p "$TMP"
