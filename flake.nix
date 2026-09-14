@@ -76,7 +76,6 @@
             ];
             settingHook = ''
               export BATS_LIB_PATH="${bats}/share/bats"
-              ${self.packages.${sys}.setting}/bin/sync-setting .
               _assemble_out="$(mktemp -d)"
               FRAGMENTS="${builtins.concatStringsSep " " fragments}" \
                 out="$_assemble_out" \
