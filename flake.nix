@@ -35,7 +35,6 @@
 
       fragments = [
         "base"
-        "set"
         "nix"
         "shell"
         "ascii"
