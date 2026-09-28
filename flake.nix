@@ -32,6 +32,7 @@
         "bats"
         "markdown"
         "yaml"
+        "toml"
       ];
       src = ./.;
       extraPackages = pkgs: {
