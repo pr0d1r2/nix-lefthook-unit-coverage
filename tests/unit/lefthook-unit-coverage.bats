@@ -159,6 +159,23 @@ test_suffix = "_spec"
     assert_output --partial "spec/models/user_spec.rb"
 }
 
+@test "mirror with strip: does not strip a partial directory name" {
+    write_config '
+[[rules]]
+glob = "*.rb"
+dirs = ["app2"]
+test_dir = "spec"
+pattern = "mirror"
+strip = "app"
+'
+    mkdir -p "$TMP/app2/models" "$TMP/spec/app2/models"
+    touch "$TMP/app2/models/user.rb"
+    touch "$TMP/spec/app2/models/user.rb"
+
+    run lefthook-unit-coverage
+    assert_success
+}
+
 @test "flat pattern: maps to test dir without path" {
     write_config '
 [[rules]]
