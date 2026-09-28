@@ -33,9 +33,12 @@ fi
 
 total_missing=0
 idx=0
-while taplo get -f "$CONFIG" -o value "rules[$idx].glob" >/dev/null 2>&1; do
-  rule_glob="$(taplo get -f "$CONFIG" -o value "rules[$idx].glob")"
-  rule_test_dir="$(taplo get -f "$CONFIG" -o value "rules[$idx].test_dir")"
+rule_count="$(taplo get -f "$CONFIG" -o json rules 2>/dev/null \
+  | grep -cE '^[[:space:]]*\{' || true)"
+rule_count="${rule_count:-0}"
+while [ "$idx" -lt "$rule_count" ]; do
+  rule_glob="$(taplo get -f "$CONFIG" -o value "rules[$idx].glob" 2>/dev/null || true)"
+  rule_test_dir="$(taplo get -f "$CONFIG" -o value "rules[$idx].test_dir" 2>/dev/null || true)"
   if [ -z "$rule_glob" ] || [ -z "$rule_test_dir" ]; then
     echo "lefthook-unit-coverage: rule $idx must define glob, dirs, and test_dir" >&2
     exit 1

@@ -439,6 +439,19 @@ pattern = "mirror"
     assert_output --partial "must define glob, dirs, and test_dir"
 }
 
+@test "rule without glob fails with error" {
+    write_config '
+[[rules]]
+dirs = ["scripts"]
+test_dir = "tests"
+pattern = "mirror"
+'
+
+    run lefthook-unit-coverage
+    assert_failure
+    assert_output --partial "must define glob, dirs, and test_dir"
+}
+
 @test "no rules in config: passes vacuously" {
     write_config ''
 
