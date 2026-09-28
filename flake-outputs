@@ -41,9 +41,11 @@ let
 pkgs = nixpkgs.legacyPackages.${system};
 fragments = [
 "base"
+"actions"
 "nix"
 "shell"
 "ascii"
+"bats"
 "markdown"
 "yaml"
 ];
@@ -88,9 +90,11 @@ system:
 pkgs = nixpkgs.legacyPackages.${system};
 fragments = [
 "base"
+"actions"
 "nix"
 "shell"
 "ascii"
+"bats"
 "markdown"
 "yaml"
 ];
@@ -118,9 +122,11 @@ let
 pkgs = nixpkgs.legacyPackages.${system};
 fragments = [
 "base"
+"actions"
 "nix"
 "shell"
 "ascii"
+"bats"
 "markdown"
 "yaml"
 ];
@@ -156,5 +162,4 @@ bash "$CONFIRM_SCRIPT"
 }
 );
 }
-
 
