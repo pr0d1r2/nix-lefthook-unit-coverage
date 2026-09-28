@@ -19,6 +19,11 @@ if [ ! -f "$CONFIG" ]; then
   exit 1
 fi
 
+if ! taplo check "$CONFIG" >/dev/null 2>&1; then
+  echo "lefthook-unit-coverage: invalid TOML in $CONFIG" >&2
+  exit 1
+fi
+
 ALLOWLIST_FILE="$(taplo get -f "$CONFIG" -o value 'allowlist' 2>/dev/null || echo ".coverage-allowlist")"
 
 declare -A allow=()
