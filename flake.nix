@@ -25,28 +25,18 @@
       nix-lefthook,
       ...
     }:
-    let
-      supportedSystems = [
+    {
+      packages = nixpkgs.lib.genAttrs [
         "aarch64-darwin"
         "x86_64-darwin"
         "x86_64-linux"
         "aarch64-linux"
-      ];
-      forAllSystems =
-        f: nixpkgs.lib.genAttrs supportedSystems (system: f nixpkgs.legacyPackages.${system});
-
-      fragments = [
-        "base"
-        "nix"
-        "shell"
-        "ascii"
-        "markdown"
-        "yaml"
-      ];
-    in
-    {
-      packages = forAllSystems (pkgs: {
-        default = pkgs.writeShellApplication {
+      ] (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          default = pkgs.writeShellApplication {
           name = "lefthook-unit-coverage";
           runtimeInputs = with pkgs; [
             git
@@ -59,8 +49,17 @@
         setting = (set-and-setting.lib.mkSetting { inherit pkgs; }).materialized;
       });
 
-      devShells = forAllSystems (
-        pkgs:
+      devShells = nixpkgs.lib.genAttrs [
+        "aarch64-darwin"
+        "x86_64-darwin"
+        "x86_64-linux"
+        "aarch64-linux"
+      ] (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          fragments = [ "base" "nix" "shell" "ascii" "markdown" "yaml" ];
+        in
         let
           mat = set-and-setting.lib.materializationFor { inherit pkgs fragments; };
           bats = pkgs.bats.withLibraries (libraries: [
@@ -90,24 +89,35 @@
         shells // { ci = shells.default; }
       );
 
-      checks = forAllSystems (
-        pkgs:
+      checks = nixpkgs.lib.genAttrs [
+        "aarch64-darwin"
+        "x86_64-darwin"
+        "x86_64-linux"
+        "aarch64-linux"
+      ] (system:
         (set-and-setting.lib.checksFor {
-          inherit pkgs fragments;
+          pkgs = nixpkgs.legacyPackages.${system};
+          fragments = [ "base" "nix" "shell" "ascii" "markdown" "yaml" ];
           src = ./.;
         })
         // {
           dep-graph = set-and-setting.lib.mkDepGraphCheck {
-            inherit pkgs;
+            pkgs = nixpkgs.legacyPackages.${system};
             projectRoot = ./.;
           };
-          default = pkgs.runCommand "checks" { } "touch $out";
+          default = nixpkgs.legacyPackages.${system}.runCommand "checks" { } "touch $out";
         }
       );
 
-      apps = forAllSystems (
-        pkgs:
+      apps = nixpkgs.lib.genAttrs [
+        "aarch64-darwin"
+        "x86_64-darwin"
+        "x86_64-linux"
+        "aarch64-linux"
+      ] (system:
         let
+          pkgs = nixpkgs.legacyPackages.${system};
+          fragments = [ "base" "nix" "shell" "ascii" "markdown" "yaml" ];
           mat = set-and-setting.lib.materializationFor { inherit pkgs fragments; };
         in
         {
