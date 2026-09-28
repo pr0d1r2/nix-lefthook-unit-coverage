@@ -36,6 +36,10 @@ idx=0
 while taplo get -f "$CONFIG" -o value "rules[$idx].glob" >/dev/null 2>&1; do
   rule_glob="$(taplo get -f "$CONFIG" -o value "rules[$idx].glob")"
   rule_test_dir="$(taplo get -f "$CONFIG" -o value "rules[$idx].test_dir")"
+  if [ -z "$rule_glob" ] || [ -z "$rule_test_dir" ]; then
+    echo "lefthook-unit-coverage: rule $idx must define glob, dirs, and test_dir" >&2
+    exit 1
+  fi
   rule_pattern="$(taplo get -f "$CONFIG" -o value "rules[$idx].pattern" 2>/dev/null || echo "mirror")"
   rule_test_ext="$(taplo get -f "$CONFIG" -o value "rules[$idx].test_ext" 2>/dev/null || echo "")"
   rule_test_suffix="$(taplo get -f "$CONFIG" -o value "rules[$idx].test_suffix" 2>/dev/null || echo "")"
@@ -101,8 +105,9 @@ while taplo get -f "$CONFIG" -o value "rules[$idx].glob" >/dev/null 2>&1; do
 
     rel_path="$impl_dir"
     if [ -n "$rule_strip" ]; then
-      rel_path="${impl_dir#"$rule_strip"}"
-      rel_path="${rel_path#/}"
+      case "$impl_dir" in
+        "$rule_strip"/*) rel_path="${impl_dir#"$rule_strip"/}" ;;
+      esac
     fi
 
     if [ -n "$rule_test_ext" ]; then

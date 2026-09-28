@@ -1174,6 +1174,10 @@
           "nixpkgs"
         ],
         "nixpkgs-lock": "nixpkgs-lock",
+        "nix-lefthook": [
+          "set-and-setting",
+          "nix-lefthook"
+        ],
         "set-and-setting": "set-and-setting"
       }
     },

@@ -14,6 +14,7 @@
     # standard revision that exports that wrapper; the older transitive pin
     # in nixpkgs-lock does not, causing CI's final command to exit 127.
     set-and-setting.url = "github:pr0d1r2/set-and-setting/d0196d19a0611cc959d967da4ec9f2bd72f14927";
+    nix-lefthook.follows = "set-and-setting/nix-lefthook";
   };
 
   outputs =
@@ -21,6 +22,7 @@
       self,
       nixpkgs,
       set-and-setting,
+      nix-lefthook,
       ...
     }:
     let
@@ -71,7 +73,7 @@
             basePackages = mat.packages ++ [
               bats
               self.packages.${sys}.default
-              set-and-setting.inputs.nix-lefthook.packages.${sys}.lefthook-tdd-order-bats
+              nix-lefthook.packages.${sys}.lefthook-tdd-order-bats
             ];
             settingHook = ''
               export BATS_LIB_PATH="${bats}/share/bats"
