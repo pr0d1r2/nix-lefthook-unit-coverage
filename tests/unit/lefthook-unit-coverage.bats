@@ -427,6 +427,18 @@ pattern = "unknown"
     assert_output --partial "unknown pattern"
 }
 
+@test "rule without dirs fails with error" {
+    write_config '
+[[rules]]
+glob = "*.sh"
+test_dir = "tests"
+pattern = "mirror"
+'
+    run lefthook-unit-coverage
+    assert_failure
+    assert_output --partial "must define glob, dirs, and test_dir"
+}
+
 @test "no rules in config: passes vacuously" {
     write_config ''
 

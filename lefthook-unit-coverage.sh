@@ -48,6 +48,10 @@ while taplo get -f "$CONFIG" -o value "rules[$idx].glob" >/dev/null 2>&1; do
 
   mapfile -t rule_dirs < <(taplo get -f "$CONFIG" -o value "rules[$idx].dirs[*]" 2>/dev/null)
   mapfile -t rule_excludes < <(taplo get -f "$CONFIG" -o value "rules[$idx].exclude[*]" 2>/dev/null)
+  if [ "${#rule_dirs[@]}" -eq 0 ] || [ -z "${rule_dirs[0]}" ]; then
+    echo "lefthook-unit-coverage: rule $idx must define glob, dirs, and test_dir" >&2
+    exit 1
+  fi
 
   ext="${rule_glob#\*.}"
 
