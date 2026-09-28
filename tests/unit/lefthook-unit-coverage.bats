@@ -70,6 +70,14 @@ EOF
     assert_output --partial "not found"
 }
 
+@test "fails when config file is invalid TOML" {
+    printf 'this is not valid TOML =\n' > "$TMP/.unit-coverage.toml"
+
+    run lefthook-unit-coverage
+    assert_failure
+    assert_output --partial "invalid TOML"
+}
+
 @test "mirror pattern: passes when all specs exist" {
     write_config '
 [[rules]]
