@@ -1,0 +1,8 @@
+allowlist = ".coverage-allowlist"
+
+[[rules]]
+glob = "*.sh"
+dirs = ["."]
+test_dir = "tests/unit"
+pattern = "flat"
+test_ext = "bats"
