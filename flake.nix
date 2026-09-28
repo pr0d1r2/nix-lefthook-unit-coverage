@@ -34,5 +34,17 @@
         "yaml"
       ];
       src = ./.;
+      extraPackages = pkgs: {
+        default = pkgs.writeShellApplication {
+          name = "lefthook-unit-coverage";
+          runtimeInputs = with pkgs; [
+            git
+            taplo
+            coreutils
+            findutils
+          ];
+          text = builtins.readFile ./lefthook-unit-coverage.sh;
+        };
+      };
     };
 }
