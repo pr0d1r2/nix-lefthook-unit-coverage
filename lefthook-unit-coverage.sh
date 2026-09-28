@@ -33,8 +33,8 @@ fi
 
 total_missing=0
 idx=0
-rule_count="$(taplo get -f "$CONFIG" -o json rules 2>/dev/null \
-  | grep -cE '^[[:space:]]*\{' || true)"
+rule_count="$(taplo get -f "$CONFIG" -o json rules 2>/dev/null |
+  grep -cE '^[[:space:]]*\{' || true)"
 rule_count="${rule_count:-0}"
 while [ "$idx" -lt "$rule_count" ]; do
   rule_glob="$(taplo get -f "$CONFIG" -o value "rules[$idx].glob" 2>/dev/null || true)"
