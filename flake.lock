@@ -702,11 +702,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790957371,
-        "narHash": "sha256-iL/YEzut0I+3i1fNnKSsZi8pJMGftE0hS2Mq1JEIUn4=",
+        "lastModified": 1791122408,
+        "narHash": "sha256-VexGN+0tUSX7lpwP/JL6MdSGYZUzzZrYuiZbcrDtISg=",
         "owner": "pr0d1r2",
         "repo": "set-and-setting",
-        "rev": "c54b884879d64492523421472069bf7709c912d3",
+        "rev": "552cc568495ba7f328ef448026dc09b921c25a9a",
         "type": "github"
       },
       "original": {
