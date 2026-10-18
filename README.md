@@ -6,7 +6,7 @@
 > what it may not, and what to check before trusting anything in this tree.
 <!-- hallucinogen:autonomy-disclaimer end -->
 
-[![CI](https://github.com/pr0d1r2/nix-lefthook-unit-coverage/actions/workflows/ci.yml/badge.svg)](https://github.com/pr0d1r2/nix-lefthook-unit-coverage/actions/workflows/ci.yml)
+[![CI](https://github.com/pr0d1r2/nix-lefthook-unit-coverage/actions/workflows/ci.yml/badge.svg)](https://github.com/pr0d1r2/nix-lefthook-unit-coverage/actions/workflows/ci.yml) [![NixOS 26.05](https://img.shields.io/badge/NixOS-26.05-blue.svg?logo=nixos)](https://nixos.org)
 
 > This code is LLM-generated and validated through an automated integration
 > process using [lefthook](https://github.com/evilmartians/lefthook) git hooks,
@@ -67,6 +67,15 @@ exclude = ["vendor"]
 | flat, suffix=_test | `lib/bundix/convert.rb` | `test/convert_test.rb` |
 | mirror, normalize | `nix/dev/shell_hook.sh` | `tests/unit/nix/dev/shell-hook.bats` |
 
+## Architecture
+
+```mermaid
+flowchart LR
+  consumer["consumer lefthook.yml"] -->|"remotes"| remote["lefthook-remote.yml"]
+  remote -->|"pre-push"| lefthook_unit_coverage["lefthook-unit-coverage"]
+  lefthook_unit_coverage -->|"exit status"| consumer
+```
+
 ## Usage
 
 ### Option A: Lefthook remote (recommended)
@@ -95,6 +104,19 @@ inputs.nix-lefthook-unit-coverage = {
 | `LEFTHOOK_UNIT_COVERAGE_TIMEOUT` | `30` | Timeout in seconds |
 | `LEFTHOOK_UNIT_COVERAGE_CONFIG` | `.unit-coverage.toml` | Path to config file |
 | `LEFTHOOK_UNIT_COVERAGE_ROOT` | git root | Override repo root (for testing) |
+
+## Development architecture
+
+```mermaid
+flowchart LR
+  envrc[".envrc"] -->|"use flake"| flake["flake.nix"]
+  flake -->|"mkConsumerFlake"| sas["set-and-setting"]
+  flake -->|"devShell"| shell["dev shell"]
+  shell -->|"on entry"| devsh["dev.sh"]
+  sas -->|"assembled hooks"| lh["lefthook.yml"]
+  lh -->|"pre-commit / pre-push"| checks["linters, bats, nix flake check"]
+  ci[".github/workflows/ci.yml"] -->|"guardrails.yml"| checks
+```
 
 ## License
 
