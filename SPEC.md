@@ -46,9 +46,9 @@ zero private refs.
   `lefthook-unit-coverage`, `runtimeInputs = [ git taplo coreutils findutils ]`
 - I.devshell: `devShells.${system}.default` + `.#ci` — dev/CI shells built
   inline with `pkgs.mkShell`
-- I.ci: `.github/workflows/ci.yml` — linux + macos via
-  `nix-lefthook-ci-action`; `.github/workflows/update-pins.yml` — daily
-  `nixpkgs-lock` bump PR
+- I.ci: `.github/workflows/ci.yml` — calls set-and-setting's reusable
+  `guardrails.yml` pinned to a full commit SHA; status contexts
+  `guardrails / check` (linux) and `guardrails / check-darwin` (macos)
 
 ## §V Invariants
 
